@@ -12,14 +12,14 @@ It is composed by 3 containers:
 
 ## Installation
 
-1. 😀 Clone this rep.
+1. Run `docker-compose up -d`
 
-2. Run `docker-compose up -d`
-
-3. The 3 containers are deployed:
+2. The 3 containers are deployed:
 
 ```
 Creating symfony-docker_db_1    ... done
 Creating symfony-docker_php_1   ... done
 Creating symfony-docker_nginx_1 ... done
 ```
+
+3. docker exec -it  symfony-docker_php_1 bash
