@@ -30,7 +30,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'c1fbde543057c441cc307e8062336495424bf20d',
+    'reference' => '4ea499a95839c2e83477a54d2966623c64064ac0',
     'name' => '__root__',
   ),
   'versions' => 
@@ -42,7 +42,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'c1fbde543057c441cc307e8062336495424bf20d',
+      'reference' => '4ea499a95839c2e83477a54d2966623c64064ac0',
     ),
     'composer/package-versions-deprecated' => 
     array (
@@ -325,6 +325,15 @@ private static $installed = array (
       array (
         0 => '1.0',
       ),
+    ),
+    'sensio/framework-extra-bundle' => 
+    array (
+      'pretty_version' => 'v6.2.0',
+      'version' => '6.2.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '3f5b6490878f8a70ba702e9692007cf979b42f0e',
     ),
     'symfony/asset' => 
     array (
