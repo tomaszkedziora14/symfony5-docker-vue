@@ -199,6 +199,10 @@
         <argument type="service" id=".service_locator.5nX7ca3.App\Controller\OrdersController"/>
       </call>
     </service>
+    <service id="App\Repository\OrdersRepository" class="App\Repository\OrdersRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener">
       <tag name="kernel.event_subscriber"/>
@@ -1449,7 +1453,7 @@
       <factory class="Doctrine\ORM\EntityManager" method="create"/>
     </service>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory">
-      <argument type="service" id=".service_locator.Xbsa8iG"/>
+      <argument type="service" id=".service_locator.GSl6MJn"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -2014,6 +2018,8 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\OrdersController" class="App\Controller\OrdersController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\OrdersController" class="App\Controller\OrdersController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\OrdersController" class="App\Controller\OrdersController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\OrdersRepository" class="App\Repository\OrdersRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\OrdersRepository" class="App\Repository\OrdersRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".service_locator.0GV1BZZ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -2346,6 +2352,12 @@
       <argument type="collection">
         <argument key="doctrine.orm.default_listeners.attach_entity_listeners" type="service_closure" id="doctrine.orm.default_listeners.attach_entity_listeners"/>
         <argument key="doctrine.orm.listeners.pdo_cache_adapter_doctrine_schema_subscriber" type="service_closure" id="doctrine.orm.listeners.pdo_cache_adapter_doctrine_schema_subscriber"/>
+      </argument>
+    </service>
+    <service id=".service_locator.GSl6MJn" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="App\Repository\OrdersRepository" type="service_closure" id="App\Repository\OrdersRepository"/>
       </argument>
     </service>
     <service id="logger" class="Symfony\Component\HttpKernel\Log\Logger"/>
