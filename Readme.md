@@ -23,3 +23,8 @@ Creating symfony-docker_nginx_1 ... done
 ```
 
 3. docker exec -it  symfony-docker_php_1 bash
+
+4. php bin/console anny commands
+
+
+5. yarn encore dev --watch
