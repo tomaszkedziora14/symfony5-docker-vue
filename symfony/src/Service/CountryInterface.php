@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-Interface CountryInterface
+interface CountryInterface
 {
     /**
      * @return array
@@ -12,12 +12,12 @@ Interface CountryInterface
     /**
      * @return array
      */
-    public function fullCountryInfo(): array;
+    public function fullCountryInfo($countryISOCode): array;
 
     /**
      * @return array
      */
-    public function FullCountryInfoAllCountries(): array;
+    public function fullCountryInfoAllCountries(): array;
 
     /**
      * @return array

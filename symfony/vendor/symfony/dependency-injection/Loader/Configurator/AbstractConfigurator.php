@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\Config\Loader\ParamConfigurator;
-use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -22,12 +20,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 abstract class AbstractConfigurator
 {
-    public const FACTORY = 'unknown';
-
-    /**
-     * @var callable(mixed, bool $allowService)|null
-     */
-    public static $valuePreProcessor;
+    const FACTORY = 'unknown';
 
     /** @internal */
     protected $definition;
@@ -39,19 +32,6 @@ abstract class AbstractConfigurator
         }
 
         throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
-    }
-
-    /**
-     * @return array
-     */
-    public function __sleep()
-    {
-        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
-    }
-
-    public function __wakeup()
-    {
-        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
 
     /**
@@ -69,11 +49,7 @@ abstract class AbstractConfigurator
                 $value[$k] = static::processValue($v, $allowServices);
             }
 
-            return self::$valuePreProcessor ? (self::$valuePreProcessor)($value, $allowServices) : $value;
-        }
-
-        if (self::$valuePreProcessor) {
-            $value = (self::$valuePreProcessor)($value, $allowServices);
+            return $value;
         }
 
         if ($value instanceof ReferenceConfigurator) {
@@ -85,10 +61,6 @@ abstract class AbstractConfigurator
             $value->definition = null;
 
             return $def;
-        }
-
-        if ($value instanceof ParamConfigurator) {
-            return (string) $value;
         }
 
         if ($value instanceof self) {
@@ -104,13 +76,12 @@ abstract class AbstractConfigurator
             case $value instanceof Definition:
             case $value instanceof Expression:
             case $value instanceof Parameter:
-            case $value instanceof AbstractArgument:
             case $value instanceof Reference:
                 if ($allowServices) {
                     return $value;
                 }
         }
 
-        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
+        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', \is_object($value) ? \get_class($value) : \gettype($value)));
     }
 }

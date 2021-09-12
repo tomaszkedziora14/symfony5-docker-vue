@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Cache\Adapter;
 
+use Doctrine\DBAL\Abstraction\Result;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Driver\ServerInfoAwareConnection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -83,17 +84,17 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         } elseif (\is_string($connOrDsn)) {
             $this->dsn = $connOrDsn;
         } else {
-            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, get_debug_type($connOrDsn)));
+            throw new InvalidArgumentException(sprintf('"%s" requires PDO or Doctrine\DBAL\Connection instance or DSN string as first argument, "%s" given.', __CLASS__, \is_object($connOrDsn) ? \get_class($connOrDsn) : \gettype($connOrDsn)));
         }
 
-        $this->table = $options['db_table'] ?? $this->table;
-        $this->idCol = $options['db_id_col'] ?? $this->idCol;
-        $this->dataCol = $options['db_data_col'] ?? $this->dataCol;
-        $this->lifetimeCol = $options['db_lifetime_col'] ?? $this->lifetimeCol;
-        $this->timeCol = $options['db_time_col'] ?? $this->timeCol;
-        $this->username = $options['db_username'] ?? $this->username;
-        $this->password = $options['db_password'] ?? $this->password;
-        $this->connectionOptions = $options['db_connection_options'] ?? $this->connectionOptions;
+        $this->table = isset($options['db_table']) ? $options['db_table'] : $this->table;
+        $this->idCol = isset($options['db_id_col']) ? $options['db_id_col'] : $this->idCol;
+        $this->dataCol = isset($options['db_data_col']) ? $options['db_data_col'] : $this->dataCol;
+        $this->lifetimeCol = isset($options['db_lifetime_col']) ? $options['db_lifetime_col'] : $this->lifetimeCol;
+        $this->timeCol = isset($options['db_time_col']) ? $options['db_time_col'] : $this->timeCol;
+        $this->username = isset($options['db_username']) ? $options['db_username'] : $this->username;
+        $this->password = isset($options['db_password']) ? $options['db_password'] : $this->password;
+        $this->connectionOptions = isset($options['db_connection_options']) ? $options['db_connection_options'] : $this->connectionOptions;
         $this->namespace = $namespace;
         $this->marshaller = $marshaller ?? new DefaultMarshaller();
 
@@ -108,7 +109,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
      *
      * @throws \PDOException    When the table already exists
      * @throws DBALException    When the table already exists
-     * @throws Exception        When the table already exists
      * @throws \DomainException When an unsupported PDO driver is used
      */
     public function createTable()
@@ -117,8 +117,24 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $conn = $this->getConnection();
 
         if ($conn instanceof Connection) {
+            $types = [
+                'mysql' => 'binary',
+                'sqlite' => 'text',
+                'pgsql' => 'string',
+                'oci' => 'string',
+                'sqlsrv' => 'string',
+            ];
+            if (!isset($types[$this->driver])) {
+                throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
+            }
+
             $schema = new Schema();
-            $this->addTableToSchema($schema);
+            $table = $schema->createTable($this->table);
+            $table->addColumn($this->idCol, $types[$this->driver], ['length' => 255]);
+            $table->addColumn($this->dataCol, 'blob', ['length' => 16777215]);
+            $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
+            $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
+            $table->setPrimaryKey([$this->idCol]);
 
             foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
                 if (method_exists($conn, 'executeStatement')) {
@@ -138,7 +154,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 // - trailing space removal
                 // - case-insensitivity
                 // - language processing like é == e
-                $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(255) NOT NULL PRIMARY KEY, $this->dataCol MEDIUMBLOB NOT NULL, $this->lifetimeCol INTEGER UNSIGNED, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB";
+                $sql = "CREATE TABLE $this->table ($this->idCol VARBINARY(255) NOT NULL PRIMARY KEY, $this->dataCol MEDIUMBLOB NOT NULL, $this->lifetimeCol INTEGER UNSIGNED, $this->timeCol INTEGER UNSIGNED NOT NULL) COLLATE utf8_bin, ENGINE = InnoDB";
                 break;
             case 'sqlite':
                 $sql = "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->dataCol BLOB NOT NULL, $this->lifetimeCol INTEGER, $this->timeCol INTEGER NOT NULL)";
@@ -161,23 +177,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         } else {
             $conn->exec($sql);
         }
-    }
-
-    /**
-     * Adds the Table to the Schema if the adapter uses this Connection.
-     */
-    public function configureSchema(Schema $schema, Connection $forConnection): void
-    {
-        // only update the schema for this connection
-        if ($forConnection !== $this->getConnection()) {
-            return;
-        }
-
-        if ($schema->hasTable($this->table)) {
-            return;
-        }
-
-        $this->addTableToSchema($schema);
     }
 
     /**
@@ -229,7 +228,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
         $result = $stmt->execute();
 
-        if (\is_object($result)) {
+        if ($result instanceof Result) {
             $result = $result->iterateNumeric();
         } else {
             $stmt->setFetchMode(\PDO::FETCH_NUM);
@@ -268,7 +267,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $result = $stmt->execute();
 
-        return (bool) (\is_object($result) ? $result->fetchOne() : $stmt->fetchColumn());
+        return (bool) ($result instanceof DriverResult ? $result->fetchOne() : $stmt->fetchColumn());
     }
 
     /**
@@ -414,10 +413,10 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 }
                 $result = $stmt->execute();
             }
-            if (null === $driver && !(\is_object($result) ? $result->rowCount() : $stmt->rowCount())) {
+            if (null === $driver && !($result instanceof DriverResult ? $result : $stmt)->rowCount()) {
                 try {
                     $insertStmt->execute();
-                } catch (DBALException | Exception $e) {
+                } catch (DBALException $e) {
                 } catch (\PDOException $e) {
                     // A concurrent write won, let it be
                 }
@@ -452,6 +451,7 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 switch (true) {
                     case $driver instanceof \Doctrine\DBAL\Driver\Mysqli\Driver:
                         throw new \LogicException(sprintf('The adapter "%s" does not support the mysqli driver, use pdo_mysql instead.', static::class));
+
                     case $driver instanceof \Doctrine\DBAL\Driver\AbstractMySQLDriver:
                         $this->driver = 'mysql';
                         break;
@@ -472,15 +472,6 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                     case $driver instanceof \Doctrine\DBAL\Driver\PDOSqlsrv\Driver:
                     case $driver instanceof \Doctrine\DBAL\Driver\PDO\SQLSrv\Driver:
                         $this->driver = 'sqlsrv';
-                        break;
-                    case $driver instanceof \Doctrine\DBAL\Driver:
-                        $this->driver = [
-                                'mssql' => 'sqlsrv',
-                                'oracle' => 'oci',
-                                'postgresql' => 'pgsql',
-                                'sqlite' => 'sqlite',
-                                'mysql' => 'mysql',
-                            ][$driver->getDatabasePlatform()->getName()] ?? \get_class($driver);
                         break;
                     default:
                         $this->driver = \get_class($driver);
@@ -506,26 +497,5 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
         }
 
         return $this->serverVersion;
-    }
-
-    private function addTableToSchema(Schema $schema): void
-    {
-        $types = [
-            'mysql' => 'binary',
-            'sqlite' => 'text',
-            'pgsql' => 'string',
-            'oci' => 'string',
-            'sqlsrv' => 'string',
-        ];
-        if (!isset($types[$this->driver])) {
-            throw new \DomainException(sprintf('Creating the cache table is currently not implemented for PDO driver "%s".', $this->driver));
-        }
-
-        $table = $schema->createTable($this->table);
-        $table->addColumn($this->idCol, $types[$this->driver], ['length' => 255]);
-        $table->addColumn($this->dataCol, 'blob', ['length' => 16777215]);
-        $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
-        $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
-        $table->setPrimaryKey([$this->idCol]);
     }
 }

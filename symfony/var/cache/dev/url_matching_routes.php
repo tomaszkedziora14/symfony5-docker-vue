@@ -8,7 +8,7 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
-        '/country' => [[['_route' => 'country', '_controller' => 'App\\Controller\\CountryController::index'], null, null, null, false, false, null]],
+        '/country' => [[['_route' => 'country', '_controller' => 'App\\Controller\\BasicCountryInfoController::index'], null, null, null, false, false, null]],
         '/orders' => [[['_route' => 'orders', '_controller' => 'App\\Controller\\OrdersController::index'], null, null, null, false, false, null]],
     ],
     [ // $regexpList

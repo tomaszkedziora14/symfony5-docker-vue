@@ -276,8 +276,8 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             ->treatNullLike(['enabled' => true])
             ->beforeNormalization()
                 ->ifArray()
-                ->then(function (array $v) {
-                    $v['enabled'] = $v['enabled'] ?? true;
+                ->then(function ($v) {
+                    $v['enabled'] = isset($v['enabled']) ? $v['enabled'] : true;
 
                     return $v;
                 })
@@ -435,12 +435,9 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
         $node->addEquivalentValue(false, $this->falseEquivalent);
         $node->setPerformDeepMerging($this->performDeepMerging);
         $node->setRequired($this->required);
+        $node->setDeprecated($this->deprecationMessage);
         $node->setIgnoreExtraKeys($this->ignoreExtraKeys, $this->removeExtraKeys);
         $node->setNormalizeKeys($this->normalizeKeys);
-
-        if ($this->deprecation) {
-            $node->setDeprecated($this->deprecation['package'], $this->deprecation['version'], $this->deprecation['message']);
-        }
 
         if (null !== $this->normalization) {
             $node->setNormalizationClosures($this->normalization->before);

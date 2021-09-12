@@ -22,20 +22,20 @@ use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
  */
 class Definition
 {
-    private const DEFAULT_DEPRECATION_TEMPLATE = 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.';
-
     private $class;
     private $file;
     private $factory;
     private $shared = true;
-    private $deprecation = [];
+    private $deprecated = false;
+    private $deprecationTemplate;
     private $properties = [];
     private $calls = [];
     private $instanceof = [];
     private $autoconfigured = false;
     private $configurator;
     private $tags = [];
-    private $public = false;
+    private $public = true;
+    private $private = true;
     private $synthetic = false;
     private $abstract = false;
     private $lazy = false;
@@ -46,6 +46,8 @@ class Definition
     private $errors = [];
 
     protected $arguments = [];
+
+    private static $defaultDeprecationTemplate = 'The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.';
 
     /**
      * @internal
@@ -96,7 +98,7 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Reference $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -104,7 +106,7 @@ class Definition
     {
         $this->changes['factory'] = true;
 
-        if (\is_string($factory) && str_contains($factory, '::')) {
+        if (\is_string($factory) && false !== strpos($factory, '::')) {
             $factory = explode('::', $factory, 2);
         } elseif ($factory instanceof Reference) {
             $factory = [$factory, '__invoke'];
@@ -135,7 +137,7 @@ class Definition
      *
      * @throws InvalidArgumentException in case the decorated service id and the new decorated service id are equals
      */
-    public function setDecoratedService(?string $id, string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
+    public function setDecoratedService(?string $id, ?string $renamedId = null, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
         if ($renamedId && $id === $renamedId) {
             throw new InvalidArgumentException(sprintf('The decorated service inner name for "%s" must be different than the service name itself.', $id));
@@ -370,6 +372,7 @@ class Definition
         foreach ($this->calls as $i => $call) {
             if ($call[0] === $method) {
                 unset($this->calls[$i]);
+                break;
             }
         }
 
@@ -477,7 +480,7 @@ class Definition
      */
     public function getTag(string $name)
     {
-        return $this->tags[$name] ?? [];
+        return isset($this->tags[$name]) ? $this->tags[$name] : [];
     }
 
     /**
@@ -584,6 +587,7 @@ class Definition
         $this->changes['public'] = true;
 
         $this->public = $boolean;
+        $this->private = false;
 
         return $this;
     }
@@ -601,15 +605,18 @@ class Definition
     /**
      * Sets if this service is private.
      *
-     * @return $this
+     * When set, the "private" state has a higher precedence than "public".
+     * In version 3.4, a "private" service always remains publicly accessible,
+     * but triggers a deprecation notice when accessed from the container,
+     * so that the service can be made really private in 4.0.
      *
-     * @deprecated since Symfony 5.2, use setPublic() instead
+     * @return $this
      */
     public function setPrivate(bool $boolean)
     {
-        trigger_deprecation('symfony/dependency-injection', '5.2', 'The "%s()" method is deprecated, use "setPublic()" instead.', __METHOD__);
+        $this->private = $boolean;
 
-        return $this->setPublic(!$boolean);
+        return $this;
     }
 
     /**
@@ -619,7 +626,7 @@ class Definition
      */
     public function isPrivate()
     {
-        return !$this->public;
+        return $this->private;
     }
 
     /**
@@ -655,10 +662,6 @@ class Definition
     public function setSynthetic(bool $boolean)
     {
         $this->synthetic = $boolean;
-
-        if (!isset($this->changes['public'])) {
-            $this->setPublic(true);
-        }
 
         return $this;
     }
@@ -702,48 +705,29 @@ class Definition
      * Whether this definition is deprecated, that means it should not be called
      * anymore.
      *
-     * @param string $package The name of the composer package that is triggering the deprecation
-     * @param string $version The version of the package that introduced the deprecation
-     * @param string $message The deprecation message to use
+     * @param string $template Template message to use if the definition is deprecated
      *
      * @return $this
      *
      * @throws InvalidArgumentException when the message template is invalid
      */
-    public function setDeprecated(/* string $package, string $version, string $message */)
+    public function setDeprecated(bool $status = true, string $template = null)
     {
-        $args = \func_get_args();
-
-        if (\func_num_args() < 3) {
-            trigger_deprecation('symfony/dependency-injection', '5.1', 'The signature of method "%s()" requires 3 arguments: "string $package, string $version, string $message", not defining them is deprecated.', __METHOD__);
-
-            $status = $args[0] ?? true;
-
-            if (!$status) {
-                trigger_deprecation('symfony/dependency-injection', '5.1', 'Passing a null message to un-deprecate a node is deprecated.');
-            }
-
-            $message = (string) ($args[1] ?? null);
-            $package = $version = '';
-        } else {
-            $status = true;
-            $package = (string) $args[0];
-            $version = (string) $args[1];
-            $message = (string) $args[2];
-        }
-
-        if ('' !== $message) {
-            if (preg_match('#[\r\n]|\*/#', $message)) {
+        if (null !== $template) {
+            if (preg_match('#[\r\n]|\*/#', $template)) {
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
 
-            if (!str_contains($message, '%service_id%')) {
+            if (false === strpos($template, '%service_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%service_id%" placeholder.');
             }
+
+            $this->deprecationTemplate = $template;
         }
 
         $this->changes['deprecated'] = true;
-        $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE] : [];
+
+        $this->deprecated = $status;
 
         return $this;
     }
@@ -756,13 +740,11 @@ class Definition
      */
     public function isDeprecated()
     {
-        return (bool) $this->deprecation;
+        return $this->deprecated;
     }
 
     /**
      * Message to use if this definition is deprecated.
-     *
-     * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
      *
      * @param string $id Service id relying on this definition
      *
@@ -770,27 +752,13 @@ class Definition
      */
     public function getDeprecationMessage(string $id)
     {
-        trigger_deprecation('symfony/dependency-injection', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
-
-        return $this->getDeprecation($id)['message'];
-    }
-
-    /**
-     * @param string $id Service id relying on this definition
-     */
-    public function getDeprecation(string $id): array
-    {
-        return [
-            'package' => $this->deprecation['package'],
-            'version' => $this->deprecation['version'],
-            'message' => str_replace('%service_id%', $id, $this->deprecation['message']),
-        ];
+        return str_replace('%service_id%', $id, $this->deprecationTemplate ?: self::$defaultDeprecationTemplate);
     }
 
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Reference $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
@@ -798,7 +766,7 @@ class Definition
     {
         $this->changes['configurator'] = true;
 
-        if (\is_string($configurator) && str_contains($configurator, '::')) {
+        if (\is_string($configurator) && false !== strpos($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
         } elseif ($configurator instanceof Reference) {
             $configurator = [$configurator, '__invoke'];

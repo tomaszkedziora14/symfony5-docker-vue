@@ -55,17 +55,14 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
             $user = $repository->findOneBy([$this->property => $username]);
         } else {
             if (!$repository instanceof UserLoaderInterface) {
-                throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
+                throw new \InvalidArgumentException(sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, \get_class($repository)));
             }
 
             $user = $repository->loadUserByUsername($username);
         }
 
         if (null === $user) {
-            $e = new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
-            $e->setUsername($username);
-
-            throw $e;
+            throw new UsernameNotFoundException(sprintf('User "%s" not found.', $username));
         }
 
         return $user;
@@ -78,7 +75,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
         $repository = $this->getRepository();
@@ -95,10 +92,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
             $refreshedUser = $repository->find($id);
             if (null === $refreshedUser) {
-                $e = new UsernameNotFoundException('User with id '.json_encode($id).' not found.');
-                $e->setUsername(json_encode($id));
-
-                throw $e;
+                throw new UsernameNotFoundException('User with id '.json_encode($id).' not found.');
             }
         }
 
@@ -120,7 +114,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     {
         $class = $this->getClass();
         if (!$user instanceof $class) {
-            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', \get_class($user)));
         }
 
         $repository = $this->getRepository();
