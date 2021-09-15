@@ -4,11 +4,12 @@ namespace App\Service;
 
 use App\Service\BasicCountryInfoInterface;
 use App\Service\ApiCountryService;
-use App\Helpers\BasicCountryInfoArrayHelper;
 
-class BasicCountryInfoService 
+class BasicCountryInfoService
 {
 	private ApiCountryService $countryService;
+
+	private array $basicInfoData = [];
 
 	public function __construct(ApiCountryService $countryService)
 	{
@@ -21,25 +22,29 @@ class BasicCountryInfoService
 		$fullCountryInfoAllCountries = $this->countryService->fullCountryInfoAllCountries();
 		$listOfContinentsByCode = $this->countryService->listOfContinentsByCode();
 		$listOfCurrenciesByCode = $this->countryService->listOfCurrenciesByCode();
+        dump($fullCountryInfoAllCountries);
+		$basicInfoCountrydata = [];
 
-		$basicCountryInfo = [];
-		$basicCountryInfoMainArray = [];
-		$count = count($fullCountryInfoAllCountries);
+		foreach($fullCountryInfoAllCountries as $key=> $basicInfo){
+
+			$count = count($listOfContinentsByCode);
 			for($i=0; $i<$count; $i++){
-				foreach(	$listOfContinentsByCode  as $key=>	$listOfContinentsByCod){
-						$count2 = count($listOfCurrenciesByCode);
-							for($ix=0; $ix<$count2; $ix++) {
-								$basicCountryInfoMainArray[$i] = [
-						  	$basicCountryInfo[] = $fullCountryInfoAllCountries[$i]['sName'],
-							  $basicCountryInfo[] = $fullCountryInfoAllCountries[$i]['sCapitalCity'],
-							  $basicCountryInfo[] = $fullCountryInfoAllCountries[$i]['sContinentCode'] = $listOfContinentsByCode[$key]['sCode'] == $fullCountryInfoAllCountries[$i]['sContinentCode'] ? $listOfContinentsByCode[$key]['sName'] : $fullCountryInfoAllCountries[$i]['sContinentCode'] ,
-								$basicCountryInfo[] = $fullCountryInfoAllCountries[$i]['sCurrencyISOCode'] = 	$listOfCurrenciesByCode[$ix]['sISOCode'] == $fullCountryInfoAllCountries[$i]['sCurrencyISOCode'] ? 	$listOfCurrenciesByCode[$ix]['sName'] : $fullCountryInfoAllCountries[$i]['sCurrencyISOCode'],
-								$basicCountryInfo[] = $fullCountryInfoAllCountries[$i]['Languages'],
-								$basicCountryInfo[] = $fullCountryInfoAllCountries[$i]['sCountryFlag']
-			 			];
-		 			}
-	 			}
+				$fullCountryInfoAllCountries[$key]['sContinentCode'] = $listOfContinentsByCode[$i]['sCode'] == $fullCountryInfoAllCountries[$key]['sContinentCode'] ? $listOfContinentsByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sContinentCode'];
 			}
-			return $basicCountryInfoMainArray;
+
+			$count = count($listOfCurrenciesByCode);
+			for($i=0; $i<$count; $i++){
+				 $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] = $listOfCurrenciesByCode[$i]['sISOCode'] == $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] ? 	$listOfCurrenciesByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'];
+			}
+
+			$basicInfoCountrydata[$key]['cityName'] = $fullCountryInfoAllCountries[$key]['sName'];
+			$basicInfoCountrydata[$key]['capitalName'] = $fullCountryInfoAllCountries[$key]['sCapitalCity'];
+			$basicInfoCountrydata[$key]['continentName'] = $fullCountryInfoAllCountries[$key]['sContinentCode'];
+			$basicInfoCountrydata[$key]['currency'] = $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'];
+			$basicInfoCountrydata[$key]['languages'] = $fullCountryInfoAllCountries[$key]['Languages'];
+			$basicInfoCountrydata[$key]['flag'] = $fullCountryInfoAllCountries[$key]['sCountryFlag'];
+		}
+		// dump($basicInfoCountrydata);
+			return $basicInfoCountrydata;
 	}
 }

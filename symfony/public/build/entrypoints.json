@@ -3,11 +3,11 @@
     "app": {
       "js": [
         "/build/runtime.js",
-        "/build/vendors-node_modules_axios_index_js-node_modules_vue-multiselect_dist_vue-multiselect_min_css-063d8c.js",
+        "/build/vendors-node_modules_symfony_stimulus-bridge_dist_index_js-node_modules_axios_index_js-node_m-38676c.js",
         "/build/app.js"
       ],
       "css": [
-        "/build/app.css"
+        "/build/vendors-node_modules_symfony_stimulus-bridge_dist_index_js-node_modules_axios_index_js-node_m-38676c.css"
       ]
     }
   }

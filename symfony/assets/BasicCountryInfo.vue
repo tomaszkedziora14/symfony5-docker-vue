@@ -1,56 +1,70 @@
 <template>
-    <div>
-      <label class="typo__label">Groups</label>
-          <multiselect
-          v-model="value"
-          :options="options"
-          :multiple="true"
-          group-values="libs"
-          group-label="title"
-          :group-select="true"
-          placeholder="Type to search"
-          track-by="name"
-          label="name"
-          :preselect-first="true"
-          :close-on-select="false"
-          :clear-on-select="false"
-          :preserve-search="true"
-          >
-          <span slot="noResult">Oops! No elements found. Consider changing the search query.</span></multiselect>
-      <pre class="language-json"><code>{{ value  }}</code></pre>
-      <button @click="exportPDF">Export PDF</button>
-    </div>
+<div>
+  <b-container fluid class="p-0">
+     <b-row align-h="between">
+       <b-col sm="3">
+         <b-form-input v-model="filterContest" type="search" placeholder="Search a contest..."></b-form-input>
+       </b-col>
+       <b-col sm="4">
+
+
+       </b-col>
+     </b-row>
+   </b-container>
+
+   <b-table hover
+      :items="items"
+      :fields="fields">
+      :filter="filterItems"
+    </b-table>
+
+ </div>
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+
+
 
 export default {
 components: {
-  Multiselect
 },
 data () {
   return {
-    options: [],
-    basicCountryInfoService: [],
+    filterItems: "",
+    items: [],
+    fields: [
+         {
+           key: 'cityName',
+           sortable: true
+         },
+         {
+           key: 'capitalName',
+           sortable: true
+         },
+         {
+           key: 'continentName',
+           sortable: true
+         },
+         {
+           key: 'currency',
+           sortable: true
+         },
+         {
+           key: 'flag',
+           sortable: true
+         },
+       ],
   }
 },
 created() {
-  this.getDoc();
-  this.checData();
+  this.getBasicCountryInfo();
 },
 methods: {
-  getDoc() {
-    axios.get('/country').then((response) => {
-     this.options = response.data;
-      console.log(options);
-    }).catch((err) => {})
+  getBasicCountryInfo() {
+    axios.get('/country').then(response => (
+       this.items = response.data
+    ))
   },
-checData()
-{
-},
-  },
+  }
 }
 </script>
-
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

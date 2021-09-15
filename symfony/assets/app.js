@@ -1,29 +1,28 @@
-/*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
- */
 
-// any CSS you import will output into a single css file (app.css in this case)
-// import './styles/app.css';
-//
-// // start the Stimulus application
-// import './bootstrap';
-// //
-// //
+
+import './bootstrap';
 import Vue from 'vue'
-import BasicCountryInfo from './BasicCountryInfo';
-//
+// import App from './BasicCountryInfo';
+import App from './BasicInfo';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+import BootstrapVue from 'bootstrap-vue'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+Vue.use(BootstrapVue)
 
 window.axios = require('axios');
-
-
-
 Vue.config.productionTip = false
-//
+
 const app = new Vue({
-    el: '#app',
-    // components: { BasicCountryInfo  }
-		render: h => h(BasicCountryInfo)
-});
+    // el: '#app',
+		components: { App},
+		template: "<App/>"
+		 // render: h => h(App)
+}).$mount('#app')
+
+// napisz tabelke
+// wysietlaj wszystkie wiersze
+// dodaj wyszukiwanie wiersza , formularz search

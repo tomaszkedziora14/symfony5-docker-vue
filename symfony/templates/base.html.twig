@@ -10,11 +10,12 @@
     <body>
         {% block body %}
         <div id="app">
-      <app></app>
-  </div>
+          <app></app>
+      </div>
         {% endblock %}
 
         {% block javascripts %}{% endblock %}
         {{ encore_entry_script_tags('app') }}
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     </body>
 </html>
