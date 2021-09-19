@@ -18,7 +18,7 @@ class BasicCountryInfoController extends AbstractController
     }
 
     /**
-     * @Route("/test", name="country")
+     * @Route("/info", name="country")
      */
     public function index(Request $request): Response
     {
