@@ -11,8 +11,7 @@
 				 <table class="table">
 						 <thead>
 								 <tr>
-									 <th>Country</th>
-									 <th>Code</th>
+									 <th @click="sort('countryName')">Country</th>
 									 <th>Capital</th>
 									 <th>Continent</th>
 									 <th>Currency</th>
@@ -23,7 +22,6 @@
 						 <tbody>
 								 <tr v-for="item in resultQuery">
 									 <td>{{item.countryName}}</td>
-									 <td>{{item.countryCode}}</td>
 									 <td>{{item.capitalName}}</td>
 									 <td>{{item.continentName}}</td>
 									 <td>{{item.currency}}</td>
@@ -51,7 +49,7 @@ data () {
 	  resources: [],
 	  currentSort:'countryName',
 	  currentSortDir:'asc',
-	  cats:[]
+	  info:[]
   }
 },
 	computed: {
@@ -77,7 +75,7 @@ data () {
 			}
 		},
 		sortedCats:function() {
-			return this.cats.sort((a,b) => {
+			return this.info.sort((a,b) => {
 				let modifier = 1;
 				if(this.currentSortDir === 'desc') modifier = -1;
 				if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
