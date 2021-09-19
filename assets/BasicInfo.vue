@@ -74,7 +74,7 @@ data () {
 				return this.resources;
 			}
 		},
-		sortedCats:function() {
+		sortedInfo:function() {
 			return this.info.sort((a,b) => {
 				let modifier = 1;
 				if(this.currentSortDir === 'desc') modifier = -1;
