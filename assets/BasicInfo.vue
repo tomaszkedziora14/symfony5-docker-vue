@@ -7,56 +7,56 @@
 									<input class="form-control" type="text" v-model="searchQuery" placeholder="Search" />
 						 </div>
 				 </div>
-<!--		 <div class="table-responsive">-->
-<!--									 <table v-if="resources.length" class="table">-->
-<!--										 <thead>-->
-<!--										 <tr>-->
-<!--											 <th>Country</th>-->
-<!--									 <th>Capital</th>-->
-<!--									 <th>Continent</th>-->
-<!--									 <th>Currency</th>-->
-<!--									 <th>Languages</th>-->
-<!--									 <th>Flag</th>-->
-<!--								 </tr>-->
-<!--						 </thead>-->
-<!--						 <tbody>-->
-<!--								 <tr v-for="item in resultQuery">-->
-<!--									 <td>{{item.countryName}}</td>-->
-<!--									 <td>{{item.capitalName}}</td>-->
-<!--									 <td>{{item.continentName}}</td>-->
-<!--									 <td>{{item.currency}}</td>-->
-<!--									 <td v-for="lang in item">-->
-<!--										 {{lang.sName}}-->
-<!--									 </td>-->
-<!--									 <td><img v-bind:src="item.flag" alt="" width="100" height="50"></td>-->
-<!--								 </tr>-->
-<!--						 </tbody>-->
-<!--				 </table>-->
+		 <div class="table-responsive">
+									 <table v-if="resources.length" class="table">
+										 <thead>
+										 <tr>
+											 <th>Country</th>
+									 <th>Capital</th>
+									 <th>Continent</th>
+									 <th>Currency</th>
+									 <th>Languages</th>
+									 <th>Flag</th>
+								 </tr>
+						 </thead>
+						 <tbody>
+								 <tr v-for="item in resultQuery">
+									 <td>{{item.countryName}}</td>
+									 <td>{{item.capitalName}}</td>
+									 <td>{{item.continentName}}</td>
+									 <td>{{item.currency}}</td>
+									 <td v-for="lang in item">
+										 {{lang.sName}}
+									 </td>
+									 <td><img v-bind:src="item.flag" alt="" width="100" height="50"></td>
+								 </tr>
+						 </tbody>
+				 </table>
 
-			 <table  class="table">
-				 <thead>
-				 <tr>
-					 <th  @click="sortBy('countryName')">Country</th>
-					 <th>Capital</th>
-					 <th>Continent</th>
-					 <th>Currency</th>
-					 <th>Languages</th>
-					 <th>Flag</th>
-				 </tr>
-				 </thead>
-				 <tbody>
-				 <tr v-for="item in sortedItems">
-					 <td>{{item.countryName}}</td>
-					 <td>{{item.capitalName}}</td>
-					 <td>{{item.continentName}}</td>
-					 <td>{{item.currency}}</td>
-					 <td v-for="lang in item">
-						 {{lang.sName}}
-					 </td>
-					 <td><img v-bind:src="item.flag" alt="" width="100" height="50"></td>
-				 </tr>
-				 </tbody>
-			 </table>
+<!--			 <table v-if="sortedItems.length" class="table">-->
+<!--				 <thead>-->
+<!--				 <tr>-->
+<!--					 <th :class="sortedClass('countryName')" @click="sortBy('countryName')">Country</th>-->
+<!--					 <th :class="sortedClass('capitalName')" @click="sortBy('capitalName')">Capital</th>-->
+<!--					 <th>Continent</th>-->
+<!--					 <th>Currency</th>-->
+<!--					 <th>Languages</th>-->
+<!--					 <th>Flag</th>-->
+<!--				 </tr>-->
+<!--				 </thead>-->
+<!--				 <tbody>-->
+<!--				 <tr v-for="item in sortedItems">-->
+<!--					 <td>{{item.countryName}}</td>-->
+<!--					 <td>{{item.capitalName}}</td>-->
+<!--					 <td>{{item.continentName}}</td>-->
+<!--					 <td>{{item.currency}}</td>-->
+<!--					 <td v-for="lang in item">-->
+<!--						 {{lang.sName}}-->
+<!--					 </td>-->
+<!--					 <td><img v-bind:src="item.flag" alt="" width="100" height="50"></td>-->
+<!--				 </tr>-->
+<!--				 </tbody>-->
+<!--			 </table>-->
 
 
 
@@ -127,6 +127,9 @@ data () {
 			axios.get('/country').then(response => (
 					this.resources = response.data
 			)) 
+		},
+		sortedClass (key) {
+			return this.sort.key === key ? `sorted ${this.sort.isAsc ? 'asc' : 'desc' }` : '';
 		},
 		sortBy(key) {
 			this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;

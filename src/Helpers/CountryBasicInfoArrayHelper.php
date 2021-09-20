@@ -20,7 +20,6 @@ class CountryBasicInfoArrayHelper
 
     public function createArray(): array
     {
-
         $fullCountryInfoAllCountries = $this->fullCountryInfoAllCountries;
         $listOfContinentsByCode = $this->listOfContinentsByCode;
         $listOfCurrenciesByCode = $this->listOfCurrenciesByCode;
@@ -29,9 +28,15 @@ class CountryBasicInfoArrayHelper
 
         foreach($fullCountryInfoAllCountries as $key=> $basicInfo){
 
-            $this->changeContinentCodeToName($listOfContinentsByCode, $fullCountryInfoAllCountries,$key);
+            $count = count($listOfContinentsByCode);
+            for($i=0; $i<$count; $i++){
+                $fullCountryInfoAllCountries[$key]['sContinentCode'] = $listOfContinentsByCode[$i]['sCode'] == $fullCountryInfoAllCountries[$key]['sContinentCode'] ? $listOfContinentsByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sContinentCode'];
+            }
 
-            $this->changeCurrencyCodeToName( $listOfCurrenciesByCode, $fullCountryInfoAllCountries, $key);
+            $count = count($listOfCurrenciesByCode);
+            for($i=0; $i<$count; $i++){
+                $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] = $listOfCurrenciesByCode[$i]['sISOCode'] == $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] ? 	$listOfCurrenciesByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'];
+            }
 
             $languages = $this->removeKey($fullCountryInfoAllCountries[$key]);
 
@@ -46,31 +51,6 @@ class CountryBasicInfoArrayHelper
         }
 
         return $basicInfoCountrydata;
-    }
-
-
-    public function changeContinentCodeToName(
-        $listOfContinentsByCode,
-        $fullCountryInfoAllCountries,
-        $key
-    ): void {
-
-        $count = count($listOfContinentsByCode);
-        for($i=0; $i<$count; $i++){
-            $fullCountryInfoAllCountries[$key]['sContinentCode'] = $listOfContinentsByCode[$i]['sCode'] == $fullCountryInfoAllCountries[$key]['sContinentCode'] ? $listOfContinentsByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sContinentCode'];
-        }
-    }
-
-    public function changeCurrencyCodeToName(
-        $listOfCurrenciesByCode,
-        $fullCountryInfoAllCountries,
-        $key
-    ): void {
-
-        $count = count($listOfCurrenciesByCode);
-        for($i=0; $i<$count; $i++){
-            $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] = $listOfCurrenciesByCode[$i]['sISOCode'] == $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] ? 	$listOfCurrenciesByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'];
-        }
     }
 
     function removeKey(array $data): array
