@@ -10,8 +10,7 @@ use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class ApiCountryService implements CountryInterface
 {
-	private HttpClientInterface $client;
-
+    
 	const METHOD_GET = 'GET';
 
 	private $url = [
@@ -22,7 +21,7 @@ class ApiCountryService implements CountryInterface
 						'http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/ListOfCurrenciesByCode/JSON/debug?'
 					];
 
-	public function __construct(HttpClientInterface $client)
+	public function __construct()
 	{
             $store = new Store('../var/cache/storage/');
             $client = HttpClient::create();
