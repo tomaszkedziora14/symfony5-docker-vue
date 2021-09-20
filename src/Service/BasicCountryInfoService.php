@@ -6,7 +6,7 @@ use App\Service\BasicCountryInfoInterface;
 use App\Service\ApiCountryService;
 use App\Helpers\CountryBasicInfoArrayHelper;
 
-class BasicCountryInfoService
+class BasicCountryInfoService implements BasicCountryInfoInterface
 {
 	private ApiCountryService $countryService;
 	private CountryBasicInfoArrayHelper $countryBasicInfoArrayHelper;
@@ -23,6 +23,7 @@ class BasicCountryInfoService
 
 	public function infoData(): array
 	{
+
         $listOfCountryNamesByName = $this->countryService->listOfCountryNamesByName();
 		$fullCountryInfoAllCountries = $this->countryService->fullCountryInfoAllCountries();
 		$listOfContinentsByCode = $this->countryService->listOfContinentsByCode();
@@ -34,6 +35,5 @@ class BasicCountryInfoService
         $result = $basicInfo->createArray();
 
         return $result;
-
 	}
 }
