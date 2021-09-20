@@ -4,6 +4,9 @@ namespace App\Service;
 
 use App\Service\CountryInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class ApiCountryService implements CountryInterface
 {
@@ -21,7 +24,10 @@ class ApiCountryService implements CountryInterface
 
 	public function __construct(HttpClientInterface $client)
 	{
-			$this->client = $client;
+            $store = new Store('../var/cache/storage/');
+            $client = HttpClient::create();
+            $client = new CachingHttpClient($client, $store);
+	        $this->client =  $client;
 	}
 
 	/**
