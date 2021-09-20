@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Service\CountryInterface;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpKernel\HttpCache\Store;
