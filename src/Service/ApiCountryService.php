@@ -10,7 +10,8 @@ use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class ApiCountryService implements CountryInterface
 {
-    
+	private $client;
+
 	const METHOD_GET = 'GET';
 
 	private $url = [
