@@ -11,8 +11,6 @@ class BasicCountryInfoService implements BasicCountryInfoInterface
 	private ApiCountryService $countryService;
 	private CountryBasicInfoArrayHelper $countryBasicInfoArrayHelper;
 
-	private array $basicInfoData = [];
-
 	public function __construct(
 	    ApiCountryService $countryService,
         CountryBasicInfoArrayHelper $countryBasicInfoArrayHelper
