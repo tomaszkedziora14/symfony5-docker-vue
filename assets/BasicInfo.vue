@@ -11,7 +11,7 @@
 				 <table class="table">
 						 <thead>
 								 <tr>
-									 <th @click="sort('countryName')">Country</th>
+									 <th v-on:click="sortedData()">Country</th>
 									 <th>Capital</th>
 									 <th>Continent</th>
 									 <th>Currency</th>
@@ -49,7 +49,6 @@ data () {
 	  resources: [],
 	  currentSort:'countryName',
 	  currentSortDir:'asc',
-	  info:[]
   }
 },
 	computed: {
@@ -69,20 +68,12 @@ data () {
 						return item.languages.sName
 					}
 				})
-				return country.concat(code)
+				return country.concat(code,lang)
 			}else{
 				return this.resources;
 			}
 		},
-		sortedInfo:function() {
-			return this.info.sort((a,b) => {
-				let modifier = 1;
-				if(this.currentSortDir === 'desc') modifier = -1;
-				if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
-				if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
-				return 0;
-			});
-		},
+
 	},
 	created() {
 		this.getBasicCountryInfo();
@@ -93,12 +84,15 @@ data () {
 					this.resources = response.data
 			)) 
 		},
-		sort:function(s) {
-			//if s == current sort, reverse
-			if(s === this.currentSort) {
-				this.currentSortDir = this.currentSortDir==='asc'?'desc':'asc';
-			}
-			this.currentSort = s;
+		sortedData:function() {
+			return this.resources.sort((a,b) => {
+				let modifier = 1;
+				console.log(a[this.currentSort]);
+				if(this.currentSortDir === 'desc') modifier = -1;
+				if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
+				if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+				return 0;
+			});
 		},
 	}
 }
