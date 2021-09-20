@@ -18,7 +18,7 @@ class CountryBasicInfoArrayHelper
         return $this;
     }
 
-    public function createArray()
+    public function createArray(): array
     {
 
         $fullCountryInfoAllCountries = $this->fullCountryInfoAllCountries;
