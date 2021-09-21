@@ -95,9 +95,8 @@ data () {
 				});
 			}
 			const lang = this.resources.filter((item)=>{
-				if(item.languages.sName === this.searchQuery){
+				console.log(item.languages.sName)
 					return item.languages.sName
-				}
 			})
 
 			if (!!this.sort.key) {
