@@ -85,15 +85,17 @@ data () {
 },
 	computed: {
 		sortedItems() {
-			const list = this.resources.slice();
-			if (!!this.sort.key) {
-				list.sort((a, b) => {
-					a = a[this.sort.key]
-					b = b[this.sort.key]
 
-					return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1)
-				});
-			}
+			// const list = this.resources.slice();
+			// if (!!this.sort.key) {
+			// 	list.sort((a, b) => {
+			// 		a = a[this.sort.key]
+			// 		b = b[this.sort.key]
+			//
+			// 		return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1)
+			// 	});
+			// }
+
 			const lang = this.resources.filter((item)=>{
 				console.log(item.languages.sName)
 					return item.languages.sName
@@ -108,7 +110,7 @@ data () {
 				});
 			}
 
-			return list;
+			return lang;
 		},
 		resultQuery(){
 			if(this.searchQuery){
