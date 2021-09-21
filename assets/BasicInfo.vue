@@ -47,7 +47,7 @@
 				 </tr>
 				 </thead>
 				 <tbody>
-				 <tr v-for="item in sortedItems"  >
+				 <tr v-for="item in resultQuery"  >
 					 <td>{{item.countryName}}</td>
 					 <td>{{item.capitalName}}</td>
 					 <td>{{item.continentName}}</td>
@@ -130,14 +130,27 @@ data () {
 				})
 				return country.concat(code,lang)
 			}else{
-				return this.resources;
+				const lang = this.resources.filter((item)=>{
+					console.log(item.languages.sName)
+					return item.languages.sName
+				})
+
+				if (!!this.sort.key) {
+					lang.sort((a, b) => {
+						a = a[this.sort.key]
+						b = b[this.sort.key]
+
+						return (a === b ? 0 : a > b ? 1 : -1) * (this.sort.isAsc ? 1 : -1)
+					});
+				}
+
+				return lang;
 			}
 		},
 
 	},
 	created() {
-		this.getBasicCountryInfo(),
-		this.showHideTable()
+		this.getBasicCountryInfo()
 	},
 	methods: {
 		getBasicCountryInfo() {
@@ -152,10 +165,6 @@ data () {
 			this.sort.isAsc = this.sort.key === key ? !this.sort.isAsc : false;
 			this.sort.key = key;
 		},
-		showHideTable(){
-
-		}
-
 	}
 }
 </script>
