@@ -30,7 +30,7 @@ class BasicCountryInfoController extends AbstractController
      */
     public function getData(): Response
     {
-         $basicCountryInfoService = $this->basicCountryInfoService->infoData();
-         return $this->json($basicCountryInfoService);
+        $basicCountryInfoService = $this->basicCountryInfoService->infoData();
+        return $this->json($basicCountryInfoService);
     }
 }
