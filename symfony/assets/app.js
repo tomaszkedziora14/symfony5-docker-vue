@@ -10,6 +10,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+var jQuery = require('jquery');
 
 Vue.use(BootstrapVue)
 
@@ -23,6 +24,3 @@ const app = new Vue({
 		 // render: h => h(App)
 }).$mount('#app')
 
-// napisz tabelke
-// wysietlaj wszystkie wiersze
-// dodaj wyszukiwanie wiersza , formularz search

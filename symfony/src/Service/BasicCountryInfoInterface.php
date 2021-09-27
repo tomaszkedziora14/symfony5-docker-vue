@@ -4,8 +4,8 @@ namespace App\Service;
 
 interface BasicCountryInfoInterface
 {
-		/**
-		 * @return array
-		 */
-		public function infoData(): array;
+    /**
+     * @return array
+     */
+    public function infoData(): array;
 }

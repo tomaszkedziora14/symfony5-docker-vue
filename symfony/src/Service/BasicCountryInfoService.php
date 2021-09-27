@@ -4,47 +4,34 @@ namespace App\Service;
 
 use App\Service\BasicCountryInfoInterface;
 use App\Service\ApiCountryService;
+use App\Helpers\CountryBasicInfoArrayHelper;
 
-class BasicCountryInfoService
+class BasicCountryInfoService implements BasicCountryInfoInterface
 {
-	private ApiCountryService $countryService;
+    private ApiCountryService $countryService;
+    private CountryBasicInfoArrayHelper $countryBasicInfoArrayHelper;
 
-	private array $basicInfoData = [];
+    public function __construct(
+        ApiCountryService $countryService,
+        CountryBasicInfoArrayHelper $countryBasicInfoArrayHelper
+    ) {
+        $this->countryService = $countryService;
+        $this->countryBasicInfoArrayHelper = $countryBasicInfoArrayHelper;
+    }
 
-	public function __construct(ApiCountryService $countryService)
-	{
-			$this->countryService = $countryService;
-	}
+    public function infoData(): array
+    {
 
-	public function infoData(): array
-	{
-		$listOfCountryNamesByName = $this->countryService->listOfCountryNamesByName();
-		$fullCountryInfoAllCountries = $this->countryService->fullCountryInfoAllCountries();
-		$listOfContinentsByCode = $this->countryService->listOfContinentsByCode();
-		$listOfCurrenciesByCode = $this->countryService->listOfCurrenciesByCode();
-        dump($fullCountryInfoAllCountries);
-		$basicInfoCountrydata = [];
+        $listOfCountryNamesByName = $this->countryService->listOfCountryNamesByName();
+        $fullCountryInfoAllCountries = $this->countryService->fullCountryInfoAllCountries();
+        $listOfContinentsByCode = $this->countryService->listOfContinentsByCode();
+        $listOfCurrenciesByCode = $this->countryService->listOfCurrenciesByCode();
 
-		foreach($fullCountryInfoAllCountries as $key=> $basicInfo){
+        $data = [$fullCountryInfoAllCountries, $listOfContinentsByCode, $listOfCurrenciesByCode];
 
-			$count = count($listOfContinentsByCode);
-			for($i=0; $i<$count; $i++){
-				$fullCountryInfoAllCountries[$key]['sContinentCode'] = $listOfContinentsByCode[$i]['sCode'] == $fullCountryInfoAllCountries[$key]['sContinentCode'] ? $listOfContinentsByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sContinentCode'];
-			}
+        $basicInfo = $this->countryBasicInfoArrayHelper->setArray($data);
+        $result = $basicInfo->createArray();
 
-			$count = count($listOfCurrenciesByCode);
-			for($i=0; $i<$count; $i++){
-				 $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] = $listOfCurrenciesByCode[$i]['sISOCode'] == $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'] ? 	$listOfCurrenciesByCode[$i]['sName'] : $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'];
-			}
-
-			$basicInfoCountrydata[$key]['cityName'] = $fullCountryInfoAllCountries[$key]['sName'];
-			$basicInfoCountrydata[$key]['capitalName'] = $fullCountryInfoAllCountries[$key]['sCapitalCity'];
-			$basicInfoCountrydata[$key]['continentName'] = $fullCountryInfoAllCountries[$key]['sContinentCode'];
-			$basicInfoCountrydata[$key]['currency'] = $fullCountryInfoAllCountries[$key]['sCurrencyISOCode'];
-			$basicInfoCountrydata[$key]['languages'] = $fullCountryInfoAllCountries[$key]['Languages'];
-			$basicInfoCountrydata[$key]['flag'] = $fullCountryInfoAllCountries[$key]['sCountryFlag'];
-		}
-		// dump($basicInfoCountrydata);
-			return $basicInfoCountrydata;
-	}
+        return $result;
+    }
 }

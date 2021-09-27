@@ -18,7 +18,7 @@ class BasicCountryInfoController extends AbstractController
     }
 
     /**
-     * @Route("/test", name="country")
+     * @Route("/info", name="country")
      */
     public function index(Request $request): Response
     {
@@ -31,7 +31,6 @@ class BasicCountryInfoController extends AbstractController
     public function getData(): Response
     {
         $basicCountryInfoService = $this->basicCountryInfoService->infoData();
-      //  return new Response(json_encode($basicCountryInfoService[0]));
-         return $this->json($basicCountryInfoService);
+        return $this->json($basicCountryInfoService);
     }
 }

@@ -28,3 +28,5 @@ Creating symfony-docker_nginx_1 ... done
 
 
 5. yarn encore dev --watch
+
+- https://symfony.com/doc/current/frontend/encore/simple-example.html

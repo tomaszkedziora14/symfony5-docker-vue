@@ -200,14 +200,7 @@
         <argument type="service" id=".service_locator.pNNo5z3.App\Controller\BasicCountryInfoController"/>
       </call>
     </service>
-    <service id="App\Controller\OrdersController" class="App\Controller\OrdersController" public="true" autowire="true" autoconfigure="true">
-      <tag name="controller.service_arguments"/>
-      <tag name="container.service_subscriber"/>
-      <call method="setContainer">
-        <argument type="service" id=".service_locator.pNNo5z3.App\Controller\OrdersController"/>
-      </call>
-    </service>
-    <service id="App\Helpers\BasicCountryInfoArrayHelper" class="App\Helpers\BasicCountryInfoArrayHelper" autowire="true" autoconfigure="true"/>
+    <service id="App\Helpers\CountryBasicInfoArrayHelper" class="App\Helpers\CountryBasicInfoArrayHelper" autowire="true" autoconfigure="true"/>
     <service id="App\Repository\ClientRepository" class="App\Repository\ClientRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
@@ -216,11 +209,10 @@
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
-    <service id="App\Service\ApiCountryService" class="App\Service\ApiCountryService" autowire="true" autoconfigure="true">
-      <argument type="service" id="http_client"/>
-    </service>
+    <service id="App\Service\ApiCountryService" class="App\Service\ApiCountryService" autowire="true" autoconfigure="true"/>
     <service id="App\Service\BasicCountryInfoService" class="App\Service\BasicCountryInfoService" autowire="true" autoconfigure="true">
       <argument type="service" id="App\Service\ApiCountryService"/>
+      <argument type="service" id="App\Helpers\CountryBasicInfoArrayHelper"/>
     </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory" public="false"/>
     <service id="response_listener" class="Symfony\Component\HttpKernel\EventListener\ResponseListener" public="false">
@@ -2289,9 +2281,6 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\BasicCountryInfoController" class="App\Controller\BasicCountryInfoController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\BasicCountryInfoController" class="App\Controller\BasicCountryInfoController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\BasicCountryInfoController" class="App\Controller\BasicCountryInfoController" autowire="true" autoconfigure="true" abstract="true"/>
-    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\OrdersController" class="App\Controller\OrdersController" autowire="true" abstract="true"/>
-    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\OrdersController" class="App\Controller\OrdersController" autowire="true" abstract="true"/>
-    <service id=".abstract.instanceof.App\Controller\OrdersController" class="App\Controller\OrdersController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\ClientRepository" class="App\Repository\ClientRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\ClientRepository" class="App\Repository\ClientRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\OrdersRepository" class="App\Repository\OrdersRepository" autowire="true" abstract="true"/>
@@ -2654,12 +2643,6 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.pNNo5z3" method="withContext"/>
     </service>
-    <service id=".service_locator.pNNo5z3.App\Controller\OrdersController" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
-      <tag name="container.service_locator_context" id="App\Controller\OrdersController"/>
-      <argument>App\Controller\OrdersController</argument>
-      <argument type="service" id="service_container"/>
-      <factory service=".service_locator.pNNo5z3" method="withContext"/>
-    </service>
     <service id=".service_locator.ld1.260" class="Symfony\Component\DependencyInjection\ServiceLocator" public="false">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -2929,6 +2912,7 @@
     </service>
     <service id="Psr\Container\ContainerInterface" alias="service_container" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" public="false"/>
+    <service id="App\Service\BasicCountryInfoInterface" alias="App\Service\BasicCountryInfoService" public="false"/>
     <service id="App\Service\CountryInterface" alias="App\Service\ApiCountryService" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface" alias="parameter_bag" public="false"/>
     <service id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface" alias="parameter_bag" public="false"/>

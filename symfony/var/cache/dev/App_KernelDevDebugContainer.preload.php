@@ -10,7 +10,7 @@ if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
 }
 
 require dirname(__DIR__, 3).'/vendor/autoload.php';
-require __DIR__.'/ContainerUraaTce/App_KernelDevDebugContainer.php';
+require __DIR__.'/ContainerW3SeltG/App_KernelDevDebugContainer.php';
 
 $classes = [];
 $classes[] = 'Symfony\Bundle\FrameworkBundle\FrameworkBundle';
@@ -24,9 +24,7 @@ $classes[] = 'Symfony\Component\DependencyInjection\ServiceLocator';
 $classes[] = 'App\Controller\BasicCountryInfoController';
 $classes[] = 'App\Service\BasicCountryInfoService';
 $classes[] = 'App\Service\ApiCountryService';
-$classes[] = 'Symfony\Contracts\HttpClient\HttpClientInterface';
-$classes[] = 'Symfony\Component\HttpClient\HttpClient';
-$classes[] = 'App\Controller\OrdersController';
+$classes[] = 'App\Helpers\CountryBasicInfoArrayHelper';
 $classes[] = 'App\Repository\ClientRepository';
 $classes[] = 'App\Repository\OrdersRepository';
 $classes[] = 'Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider';
